@@ -1,72 +1,104 @@
 
 # Mini-bin
 
-A serialization/deserialization library for binary data.
+A (tiny!) serialization/deserialization library for binary data. JSON-compatible with a focus on compactness.
+
+## Table of contents
+
+- [Description](#description)
+- [Schema](#schema)
+  - [Header](#header)
+  - [Structures](#structures)
+  - [Heap](#heap)
+  - [List of types](#list-of-types)
+- [Usage](#usage)
+  - [Serialization](#serialization)
+  - [Deserialization](#deserialization)
+
+## Description
+
+lorem ipsum
 
 ## Schema
 
-```#Markdown
-Fundamental structure
+A binary file contains the following parts:
 
-size: uint64, // 64 bit unsigned integer
-type: byte, // size in bytes, and how to interpret the data
-ptr: uint64, // pointer to data
+- [Header](#header)
+- [Structures](#structures)
+- [Heap](#heap)
 
-For structures with multiple pointers, we read the next (size * 8) bytes of data, and interpret as pointer(s).
+## Header
 
-Depending on the type, there can be multiple pointers. There will always be at least one pointer per structure. We can point to the same structure, or same data, multiple times.
+This contains two pieces of data: `Meta`, and `Size`.
 
-tldr; don't attempt to modify parts of the binary, just use an array buffer for that.
+`Meta`: A single byte
+
+`Size`: An unsigned integer using between 1 and 16 bytes
+
+**Meta:**
+
+```#
+FF
+^ the first 4 bits encode the pointer size (1-16 bytes, no zero size)
+
+FF
+ ^ the last 4 bits encode the size of 'Size' (1-16 bytes, no zero size)
 ```
 
-```#Markdown
-Types
+## Structures
 
-00: ptr
-01: u8
-02: u16
-03: u32
-04: u64
-05: i8
-06: i16
-07: i32
-08: i64
-0A: f32
-0B: f64
-0C: bool
-0D: char
-0E: tuple
-0F: object
-10-FF: reserved
+`Type`: A single byte that encodes `type-info`, `meta-size`, and `reference`.
+
+`Size`: An unsigned integer using between 1 and 16 bytes, representing the # of elements of `Data`
+
+`Data`: A sequence of bytes, or a reference to a sequence of bytes. This will use the global pointer size.
+
+**Type**:
+
+```#
+00011111
+   ^^^^^
+these 5 bits encode actual type info (32 types)
+
+01100000
+ ^^
+these 2 bits encode "meta-size", between 1 and 4 bytes (2^32 - 1 elements)
+anything with more than 4,294,967,295 elements should probably be in its own file!
+
+10000000
+^
+the first bit indicates if the data is a reference (pointer)
 ```
 
-## Example
+## Heap
 
-```#Markdown
-Object representation
+The heap is a continuous section of bytes that can be referenced by pointers. This is useful if multiple structures refer to the same data AND the data is larger than the pointer size.
 
-object {
-    key: 'abcd',
-    value: 1,
-}
+## List of types
 
-//header
-size: 00 00 00 00 00 00 00 02 // (size of 2)
-type: 0F // object (ptr_size, a.k.a. 8 bytes)
-ptr: 00 00 00 00 00 00 00 0X // key
-ptr: 00 00 00 00 00 00 00 0X // value
-
-//key
-size: 00 00 00 00 00 00 00 04 // (size of 4)
-type: 0D // char (byte)
-ptr: 00 00 00 00 00 00 00 0X // points to 'abcd'
-
-//value
-size: 00 00 00 00 00 00 00 01 // (size of 1)
-type: 01 // u8 (byte)
-ptr: 00 00 00 00 00 00 00 0X // points to 1
-
-//data
-55 56 57 58 01 // abcd1
-
+```#
+x00: binary
+x01: bool
+x02: i8
+x03: i16
+x04: i32
+x05: i64
+x06: f16
+x07: f32
+x08: f64
+x09: char
+x0A: object
+x0B-x1F: unused (21 slots)
 ```
+
+## Usage
+
+lorem ipsum
+
+### Serialization
+
+lorem ipsum
+
+### Deserialization
+
+lorem ipsum
