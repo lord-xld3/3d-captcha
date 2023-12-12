@@ -47,6 +47,8 @@ FF
 
 ## Structures
 
+Each structure contains three pieces of data: `Type`, `Size`, and `Data`.
+
 `Type`: A single byte that encodes `type-info`, `meta-size`, and `reference`.
 
 `Size`: An unsigned integer using between 1 and 16 bytes, representing the # of elements of `Data`
@@ -72,28 +74,28 @@ the first bit indicates if the data is a reference (pointer)
 
 ## Heap
 
-The heap is a continuous section of bytes that can be referenced by pointers. This is useful if multiple structures refer to the same data AND the data is larger than the pointer size.
+The `heap` is a continuous section of bytes that can be referenced by pointers. This is useful if multiple structures refer to the same data AND the data is larger than the pointer size.
 
 ## List of types
 
 ```#
-x00: binary
+x00: null
 x01: bool
 x02: i8
 x03: i16
 x04: i32
 x05: i64
-x06: f16
-x07: f32
-x08: f64
-x09: char
-x0A: object
+x06: f32
+x07: f64
+x08: char
+x09: object
+x0A: binary
 x0B-x1F: unused (21 slots)
 ```
 
 ## Usage
 
-lorem ipsum
+The schema is only half the battle, parsing the data is the other half. This library is specifically for JavaScript/JSON, but the schema is language-agnostic.
 
 ### Serialization
 
