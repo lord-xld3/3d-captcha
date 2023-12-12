@@ -9,7 +9,6 @@ A (tiny!) serialization/deserialization library for binary data. JSON-compatible
 - [Schema](#schema)
   - [Header](#header)
   - [Structures](#structures)
-  - [Heap](#heap)
   - [List of types](#list-of-types)
 - [Usage](#usage)
   - [Serialization](#serialization)
@@ -25,56 +24,36 @@ A binary file contains the following parts:
 
 - [Header](#header)
 - [Structures](#structures)
-- [Heap](#heap)
 
 ## Header
 
 This contains two pieces of data: `Meta`, and `Size`.
 
-`Meta`: A single byte
+`Meta`: A single byte representing the size of `Size`.
 
-`Size`: An unsigned integer using between 1 and 16 bytes
-
-**Meta:**
-
-```#
-FF
-^ the first 4 bits encode the pointer size (1-16 bytes, no zero size)
-
-FF
- ^ the last 4 bits encode the size of 'Size' (1-16 bytes, no zero size)
-```
+`Size`: An unsigned integer using between 1 and 8 bytes, representing the # of structures in the file.
 
 ## Structures
 
 Each structure contains three pieces of data: `Type`, `Size`, and `Data`.
 
-`Type`: A single byte that encodes `type-info`, `meta-size`, and `reference`.
+`Type`: A single byte that encodes `type-info` and `meta-size`.
 
-`Size`: An unsigned integer using between 1 and 16 bytes, representing the # of elements of `Data`
+`Size`: An unsigned integer using between 1 and 8 bytes, representing the # of elements in `Data`.
 
-`Data`: A sequence of bytes, or a reference to a sequence of bytes. This will use the global pointer size.
+`Data`: A sequence of bytes.
 
-**Type**:
+### Type
 
 ```#
 00011111
    ^^^^^
 these 5 bits encode actual type info (32 types)
 
-01100000
- ^^
-these 2 bits encode "meta-size", between 1 and 4 bytes (2^32 - 1 elements)
-anything with more than 4,294,967,295 elements should probably be in its own file!
-
-10000000
-^
-the first bit indicates if the data is a reference (pointer)
+11100000
+^^^
+these 3 bits encode the size of `Size`, between 1 and 8 bytes
 ```
-
-## Heap
-
-The `heap` is a continuous section of bytes that can be referenced by pointers. This is useful if multiple structures refer to the same data AND the data is larger than the pointer size.
 
 ## List of types
 
