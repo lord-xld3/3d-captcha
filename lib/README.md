@@ -78,7 +78,11 @@ The schema is only half the battle, parsing the data is the other half. This lib
 
 ### Serialization
 
-lorem ipsum
+*Serialization refers to the process of converting data structures or objects in a specific programming language into a format that can be easily stored, transmitted, or reconstructed at a later time or in a different environment.*
+
+This means a single value isn't a data structure, you can't serialize it.
+
+JavaScript: You can serialize an array/object, including any nested structures.
 
 ### Deserialization
 
